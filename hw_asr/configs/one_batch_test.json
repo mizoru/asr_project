@@ -29,8 +29,8 @@
         {
           "type": "LibrispeechDataset",
           "args": {
-            "part": "dev-clean",
-            "max_audio_length": 20.0,
+            "part": "train-clean-100",
+            "max_audio_length": 10.0,
             "max_text_length": 200,
             "limit": 10
           }
@@ -44,8 +44,8 @@
         {
           "type": "LibrispeechDataset",
           "args": {
-            "part": "dev-clean",
-            "max_audio_length": 20.0,
+            "part": "train-clean-100",
+            "max_audio_length": 10.0,
             "max_text_length": 200,
             "limit": 10
           }
