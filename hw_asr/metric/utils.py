@@ -6,6 +6,7 @@ def calc_cer(target_text, predicted_text) -> float:
     if length != 0:
         cer = dist / length
     else: cer = dist
+    return cer
 
 
 def calc_wer(target_text, predicted_text) -> float:
@@ -13,5 +14,6 @@ def calc_wer(target_text, predicted_text) -> float:
     dist = distance(target_text, predicted_text)
     length = len(target_text)
     if length != 0:
-        cer = dist / length
-    else: cer = dist
+        wer = dist / length
+    else: wer = dist
+    return wer
