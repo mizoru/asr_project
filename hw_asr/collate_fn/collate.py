@@ -10,12 +10,13 @@ def collate_fn(dataset_items: List[dict]):
     """
     Collate and pad fields in dataset items
     """
+    
     bs = len(dataset_items)
     n_features = dataset_items[0]["spectrogram"].size(1)
     result_batch = {}
     
-    result_batch["text"] = [item["text"] for item in dataset_items]
-    result_batch["duration"] = [item["duration"] for item in dataset_items]
+    for key in ["audio_path", "text", "duration"]:
+        result_batch[key] = [item[key] for item in dataset_items]
 
     # TODO: Maybe write a single loop for these?
     audio_length = [item["audio"].size(1) for item in dataset_items]
