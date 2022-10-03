@@ -95,7 +95,7 @@ class Trainer(BaseTrainer):
                 )
             except RuntimeError as e:
                 if "out of memory" in str(e) and self.skip_oom:
-                    self.logger.warning("OOM on batch. Skipping batch.")
+                    self.logger.warning("OOM on batch. Skipping batch.\n"+str(e))
                     for p in self.model.parameters():
                         if p.grad is not None:
                             del p.grad  # free some memory
