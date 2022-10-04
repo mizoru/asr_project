@@ -25,7 +25,7 @@ class BaseTrainer:
         
         self.mixed_precision = mixed_precision
         if torch.device.type == "cpu":
-            self.mixed_dtype = torch.bfloat16
+            self.mixed_precision = False
         else:
             self.mixed_dtype = torch.float16 
 
