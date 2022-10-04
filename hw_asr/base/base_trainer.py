@@ -24,8 +24,9 @@ class BaseTrainer:
         self.scaler = scaler
         
         self.mixed_precision = mixed_precision
-        if torch.device.type == "cpu":
-            self.mixed_precision = False
+        if self.device.type == "cpu":
+            self.mixed_dtype = torch.bfloat16
+            self.logger.info(f"Setting dtype to {self.mixed_dtype} for {self.device.type}")
         else:
             self.mixed_dtype = torch.float16 
 
