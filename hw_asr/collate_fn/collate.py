@@ -37,7 +37,7 @@ def collate_fn(dataset_items: List[dict]):
     result_batch["spectrogram"] = spec_batch
     result_batch["spectrogram_length"] = torch.tensor(spectrogram_length)
 
-    text_encoded_length = [item["audio"].size(1) for item in dataset_items]
+    text_encoded_length = [item["text_encoded"].size(1) for item in dataset_items]
     max_length = max(text_encoded_length)
     text_batch = torch.zeros(bs, max_length)
     for i, item in enumerate(dataset_items):
