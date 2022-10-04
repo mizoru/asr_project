@@ -92,7 +92,7 @@ class Trainer(BaseTrainer):
             if log_batch:
                 self.logger.info("First input batch:\n")
                 for (key, value) in batch.items():
-                    if isinstance(value, torch.Tensor):
+                    if "length" not in key and isinstance(value, torch.Tensor):
                         self.logger.info(f"\t{key}.shape: {value.shape}")
                     else:
                         self.logger.info(f"\t{key}: {value}")
@@ -104,12 +104,12 @@ class Trainer(BaseTrainer):
                 )
                 if log_batch:
                     self.logger.info("First output batch:\n")
-                    for key_to_to_log in ("logits", "log_probs", "log_probs_length"):
-                        if key_to_to_log in batch:
+                    for key_to_log in ("logits", "log_probs", "log_probs_length"):
+                        if key_to_log in batch:
                             if isinstance(value, torch.Tensor):
-                                self.logger.info(f"\t{key}.shape: {value.shape}")
+                                self.logger.info(f"\t{key_to_log}.shape: {value.shape}")
                             else:
-                                self.logger.info(f"\t{key}: {value}")
+                                self.logger.info(f"\t{key_to_log}: {value}")
             except RuntimeError as e:
                 if "out of memory" in str(e) and self.skip_oom:
                     self.logger.warning("OOM on batch. Skipping batch.\n" + str(e))
