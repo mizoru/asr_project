@@ -8,7 +8,7 @@
       "args": {
         "n_mels": 128,
         "n_fft": 500,
-        "win_length ": 400
+        "win_length": 400
       }
     },
     "log_spec": true
