@@ -88,7 +88,7 @@ class Trainer(BaseTrainer):
                 tqdm(self.train_dataloader, desc="train", total=self.len_epoch)
         ):
             # log first batch
-            log_batch = batch_idx == 0 and epoch == 0
+            log_batch = batch_idx == 0 and epoch == self.start_epoch
             if log_batch:
                 self.logger.info("First input batch:\n")
                 for (key, value) in batch.items():
