@@ -8,9 +8,12 @@ class RNNWrapper(nn.Module):
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.net = nn.RNN(*args, **kwargs)
+        self.bn = nn.LazyBatchNorm1d()
 
     def forward(self, x):
         x, _ = self.net(x)
+        x = x.transpose(1, 2)
+        x = self.bn(x).transpose(1, 2)
         return x
 
 
@@ -37,11 +40,11 @@ class DeepSpeech2(BaseModel):
             nn.ReLU()
         )
         rnn_layers = [RNNWrapper(conv_channels[2], rnn_hidden, bidirectional=True,
-                                 batch_first=True, nonlinearity='relu'), nn.LazyBatchNorm1d()]
+                                 batch_first=True, nonlinearity='relu')]
         for i in range(n_rnn-1):
             rnn_layers.append(RNNWrapper(rnn_hidden*2, rnn_hidden,
                               bidirectional=True, batch_first=True, nonlinearity='relu'))
-            rnn_layers.append(nn.LazyBatchNorm1d())
+            # rnn_layers.append(nn.LazyBatchNorm1d())
 
         self.rnn = Sequential(*rnn_layers)
         self.linear = nn.Linear(rnn_hidden*2, n_class)
