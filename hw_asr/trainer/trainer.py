@@ -28,6 +28,7 @@ class Trainer(BaseTrainer):
             criterion,
             metrics,
             optimizer,
+            scaler,
             config,
             device,
             dataloaders,
@@ -35,8 +36,10 @@ class Trainer(BaseTrainer):
             lr_scheduler=None,
             len_epoch=None,
             skip_oom=True,
+            mixed_precision=True
     ):
-        super().__init__(model, criterion, metrics, optimizer, config, device)
+        super().__init__(model, criterion, metrics, optimizer,
+                         scaler, config, device, mixed_precision)
         self.skip_oom = skip_oom
         self.text_encoder = text_encoder
         self.config = config
@@ -144,24 +147,26 @@ class Trainer(BaseTrainer):
         return log
 
     def process_batch(self, batch, is_train: bool, metrics: MetricTracker):
-        batch = self.move_batch_to_device(batch, self.device)
-        if is_train:
-            self.optimizer.zero_grad()
-        outputs = self.model(**batch)
-        if type(outputs) is dict:
-            batch.update(outputs)
-        else:
-            batch["logits"] = outputs
+        # self.logger.info(self.device, type(self.device), self.device.__repr__())
+        with torch.autocast(device_type=self.device.type, dtype=self.mixed_dtype, enabled=self.mixed_precision):
+            batch = self.move_batch_to_device(batch, self.device)
+            if is_train:
+                self.optimizer.zero_grad()
+            outputs = self.model(**batch)
+            if type(outputs) is dict:
+                batch.update(outputs)
+            else:
+                batch["logits"] = outputs
 
-        batch["log_probs"] = F.log_softmax(batch["logits"], dim=-1)
-        batch["log_probs_length"] = self.model.transform_input_lengths(
-            batch["spectrogram_length"]
-        )
-        batch["loss"] = self.criterion(**batch)
+            batch["log_probs"] = F.log_softmax(batch["logits"], dim=-1)
+            batch["log_probs_length"] = self.model.transform_input_lengths(
+                batch["spectrogram_length"]
+            )
+            batch["loss"] = self.criterion(**batch)
         if is_train:
-            batch["loss"].backward()
+            self.scaler.scale(batch["loss"]).backward()
             self._clip_grad_norm()
-            self.optimizer.step()
+            self.scaler.step(self.optimizer)
             if self.lr_scheduler is not None:
                 self.lr_scheduler.step()
 

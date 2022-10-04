@@ -25,6 +25,8 @@ np.random.seed(SEED)
 
 def main(config):
     logger = config.get_logger("train")
+    
+    mixed_precision = config["mixed_precision"]
 
     # text_encoder
     text_encoder = config.get_text_encoder()
@@ -53,6 +55,7 @@ def main(config):
     # disabling scheduler
     trainable_params = filter(lambda p: p.requires_grad, model.parameters())
     optimizer = config.init_obj(config["optimizer"], torch.optim, trainable_params)
+    scaler = torch.cuda.amp.GradScaler(enabled=mixed_precision)
     lr_scheduler = config.init_obj(config["lr_scheduler"], torch.optim.lr_scheduler, optimizer)
 
     trainer = Trainer(
@@ -60,12 +63,14 @@ def main(config):
         loss_module,
         metrics,
         optimizer,
+        scaler,
         text_encoder=text_encoder,
         config=config,
         device=device,
         dataloaders=dataloaders,
         lr_scheduler=lr_scheduler,
-        len_epoch=config["trainer"].get("len_epoch", None)
+        len_epoch=config["trainer"].get("len_epoch", None),
+        mixed_precision=mixed_precision
     )
 
     trainer.train()

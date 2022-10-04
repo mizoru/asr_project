@@ -12,7 +12,7 @@ class BaseTrainer:
     Base class for all trainers
     """
 
-    def __init__(self, model: BaseModel, criterion, metrics, optimizer, config, device):
+    def __init__(self, model: BaseModel, criterion, metrics, optimizer, scaler, config, device, mixed_precision):
         self.device = device
         self.config = config
         self.logger = config.get_logger("trainer", config["trainer"]["verbosity"])
@@ -21,6 +21,13 @@ class BaseTrainer:
         self.criterion = criterion
         self.metrics = metrics
         self.optimizer = optimizer
+        self.scaler = scaler
+        
+        self.mixed_precision = mixed_precision
+        if torch.device.type == "cpu":
+            self.mixed_dtype = torch.bfloat16
+        else:
+            self.mixed_dtype = torch.float16 
 
         # for interrupt saving
         self._last_epoch = 0
