@@ -169,9 +169,11 @@ class Trainer(BaseTrainer):
             self.scaler.unscale_(self.optimizer)
             self._clip_grad_norm()
             self.scaler.step(self.optimizer)
-            self.scaler.update()
+            
             if self.lr_scheduler is not None:
                 self.lr_scheduler.step()
+                
+            self.scaler.update()
 
         metrics.update("loss", batch["loss"].item())
         for met in self.metrics:
