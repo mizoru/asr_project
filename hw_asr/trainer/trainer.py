@@ -87,15 +87,32 @@ class Trainer(BaseTrainer):
         for batch_idx, batch in enumerate(
                 tqdm(self.train_dataloader, desc="train", total=self.len_epoch)
         ):
+            # log first batch
+            log_batch = batch_idx == 0 and epoch == 0
+            if log_batch:
+                self.logger.info("First input batch:\n")
+                for (key, value) in batch.items():
+                    if isinstance(value, torch.Tensor):
+                        self.logger.info(f"\t{key}.shape: {value.shape}")
+                    else:
+                        self.logger.info(f"\t{key}: {value}")
             try:
                 batch = self.process_batch(
                     batch,
                     is_train=True,
                     metrics=self.train_metrics,
                 )
+                if log_batch:
+                    self.logger.info("First output batch:\n")
+                    for key_to_to_log in ("logits", "log_probs", "log_probs_length"):
+                        if key_to_to_log in batch:
+                            if isinstance(value, torch.Tensor):
+                                self.logger.info(f"\t{key}.shape: {value.shape}")
+                            else:
+                                self.logger.info(f"\t{key}: {value}")
             except RuntimeError as e:
                 if "out of memory" in str(e) and self.skip_oom:
-                    self.logger.warning("OOM on batch. Skipping batch.\n"+str(e))
+                    self.logger.warning("OOM on batch. Skipping batch.\n" + str(e))
                     for p in self.model.parameters():
                         if p.grad is not None:
                             del p.grad  # free some memory
