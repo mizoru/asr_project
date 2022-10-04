@@ -76,6 +76,7 @@
         "lr": 3e-4
       }
     },
+    "mixed_precision": true,
     "loss": {
       "type": "CTCLoss",
       "args": {}
