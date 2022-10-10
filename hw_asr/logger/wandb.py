@@ -96,3 +96,6 @@ class WanDBWriter:
 
     def add_embedding(self, scalar_name, scalar):
         raise NotImplementedError()
+    
+    def save_file(self, path, policy="now"):
+        self.wandb.save(path, policy=policy)

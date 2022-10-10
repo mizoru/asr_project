@@ -26,7 +26,7 @@ class BaseTrainer:
         self.mixed_precision = mixed_precision
         if self.device.type == "cpu":
             self.mixed_dtype = torch.bfloat16
-            self.logger.info(f"Setting dtype to {self.mixed_dtype} for {self.device.type}")
+            self.logger.info(f"Setting dtype to {self.mixed_dtype} for {self.device.type} device")
         else:
             self.mixed_dtype = torch.float16 
 
@@ -157,10 +157,12 @@ class BaseTrainer:
         if not (only_best and save_best):
             torch.save(state, filename)
             self.logger.info("Saving checkpoint: {} ...".format(filename))
+            self.writer.save_file(filename)
         if save_best:
             best_path = str(self.checkpoint_dir / "model_best.pth")
             torch.save(state, best_path)
             self.logger.info("Saving current best: model_best.pth ...")
+            self.writer.save_file(filename)
 
     def _resume_checkpoint(self, resume_path):
         """
