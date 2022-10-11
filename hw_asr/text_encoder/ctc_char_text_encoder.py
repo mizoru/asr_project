@@ -38,7 +38,7 @@ class CTCCharTextEncoder(CharTextEncoder):
         assert len(probs.shape) == 2
         char_length, voc_size = probs.shape
         assert voc_size == len(self.ind2char)
-        hypos: List[Hypothesis] = [Hypothesis("", 0.)]
+        hypos: List[Hypothesis] = [Hypothesis("", 1.)]
 
         def extend_and_merge_beam(hypos, idx):
             new_hypos: List[Hypothesis] = []
