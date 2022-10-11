@@ -45,9 +45,10 @@ class CTCCharTextEncoder(CharTextEncoder):
             for text, prob in hypos:
                 for char_i in range(voc_size):
                     new_char = self.ind2char[char_i]
+                    new_text = text
                     if len(text) == 0 or new_char != text[-1]:
-                        text = text.strip(self.EMPTY_TOK) + new_char
-                    new_hypos.append(Hypothesis(text, prob*probs[idx, char_i]))
+                        new_text = text.strip(self.EMPTY_TOK) + new_char
+                    new_hypos.append(Hypothesis(new_text, prob*probs[idx, char_i]))
             merged = defaultdict(float)
             for hypo in new_hypos:
                 merged[hypo.text] += hypo.prob
