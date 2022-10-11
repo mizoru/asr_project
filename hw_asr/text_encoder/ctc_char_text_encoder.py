@@ -1,4 +1,5 @@
 from typing import List, NamedTuple
+from collections import defaultdict
 
 import torch
 
@@ -28,7 +29,7 @@ class CTCCharTextEncoder(CharTextEncoder):
             if char != chars[-1]:
                 chars.append(char)
         return ''.join(chars)
-        
+
     def ctc_beam_search(self, probs: torch.tensor, probs_length,
                         beam_size: int = 100) -> List[Hypothesis]:
         """
@@ -37,7 +38,26 @@ class CTCCharTextEncoder(CharTextEncoder):
         assert len(probs.shape) == 2
         char_length, voc_size = probs.shape
         assert voc_size == len(self.ind2char)
-        hypos: List[Hypothesis] = []
-        # TODO: your code here
-        raise NotImplementedError
+        hypos: List[Hypothesis] = [Hypothesis("", 0.)]
+
+        def extend_and_merge_beam(hypos, idx):
+            new_hypos: List[Hypothesis] = []
+            for text, prob in hypos:
+                for char_i in range(voc_size):
+                    new_char = self.ind2char[char_i]
+                    if len(text) == 0 or new_char != text[-1]:
+                        text = text.strip(self.EMPTY_TOK) + new_char
+                    new_hypos.append(Hypothesis(text, prob*hypos[idx, char_i]))
+            merged = defaultdict(float)
+            for hypo in new_hypos:
+                merged[hypo.text] += hypo.prob
+            new_hypos = [Hypothesis(text, prob) or (text, prob) in merged.items()]
+            return new_hypos
+
+        def truncate_beam(hypos, beam_size):
+            return sorted(hypos, key=lambda x: x.prob, reverse=True)[:beam_size]
+
+        for idx in range(probs_length):
+            hypos = extend_and_merge_beam(hypos, idx)
+            hypos = truncate_beam(hypos, beam_size)
         return sorted(hypos, key=lambda x: x.prob, reverse=True)
