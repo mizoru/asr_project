@@ -36,7 +36,8 @@ class Trainer(BaseTrainer):
             lr_scheduler=None,
             len_epoch=None,
             skip_oom=True,
-            mixed_precision=True
+            mixed_precision=True,
+            log_step=200
     ):
         super().__init__(model, criterion, metrics, optimizer,
                          scaler, config, device, mixed_precision)
@@ -54,7 +55,7 @@ class Trainer(BaseTrainer):
         self.evaluation_dataloaders = {
             k: v for k, v in dataloaders.items() if k != "train"}
         self.lr_scheduler = lr_scheduler
-        self.log_step = 50
+        self.log_step = log_step
 
         self.train_metrics = MetricTracker(
             "loss", "grad norm", *[m.name for m in self.metrics], writer=self.writer
