@@ -40,25 +40,24 @@ class CTCCharTextEncoder(CharTextEncoder):
         assert voc_size == len(self.ind2char)
         hypos: List[Hypothesis] = [Hypothesis("", 1.)]
 
-        def extend_and_merge_beam(hypos, idx):
-            new_hypos: List[Hypothesis] = []
+        def extend_and_merge_beam(hypos, idx, last=False):
+            new_hypos = defaultdict(float)
             for text, prob in hypos:
                 for char_i in range(voc_size):
                     new_char = self.ind2char[char_i]
                     new_text = text
                     if len(text) == 0 or new_char != text[-1]:
                         new_text = text.strip(self.EMPTY_TOK) + new_char
-                    new_hypos.append(Hypothesis(new_text, prob*probs[idx, char_i]))
-            merged = defaultdict(float)
-            for hypo in new_hypos:
-                merged[hypo.text] += hypo.prob
-            new_hypos = [Hypothesis(text, prob) for (text, prob) in merged.items()]
+                    new_hypos[new_text] += prob*probs[idx, char_i]
+            new_hypos = [Hypothesis(text, prob)
+                         for (text, prob) in new_hypos.items()]
             return new_hypos
 
         def truncate_beam(hypos, beam_size):
             return sorted(hypos, key=lambda x: x.prob, reverse=True)[:beam_size]
 
         for idx in range(probs_length):
-            hypos = extend_and_merge_beam(hypos, idx)
+            hypos = extend_and_merge_beam(
+                hypos, idx, last=idx == probs_length-1)
             hypos = truncate_beam(hypos, beam_size)
         return hypos

@@ -226,11 +226,10 @@ class Trainer(BaseTrainer):
             log_probs,
             log_probs_length,
             audio_path,
-            examples_to_log=10,
+            examples_to_log=4,
             *args,
             **kwargs,
     ):
-        # TODO: implement logging of beam search results
         if self.writer is None:
             return
 
