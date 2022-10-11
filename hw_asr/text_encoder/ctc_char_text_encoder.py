@@ -38,26 +38,30 @@ class CTCCharTextEncoder(CharTextEncoder):
         assert len(probs.shape) == 2
         char_length, voc_size = probs.shape
         assert voc_size == len(self.ind2char)
-        hypos: List[Hypothesis] = [Hypothesis("", 1.)]
+        
+        probs = probs.detach().numpy()
+        probs_length = probs_length.detach().item()
+        
 
-        def extend_and_merge_beam(hypos, idx, last=False):
+        def extend_and_merge_beam(hypos, prob, last=False):
             new_hypos = defaultdict(float)
-            for text, prob in hypos:
-                for char_i in range(voc_size):
-                    new_char = self.ind2char[char_i]
-                    new_text = text
-                    if len(text) == 0 or new_char != text[-1]:
-                        new_text = text.strip(self.EMPTY_TOK) + new_char
-                    new_hypos[new_text] += prob*probs[idx, char_i]
-            new_hypos = [Hypothesis(text, prob)
-                         for (text, prob) in new_hypos.items()]
+            for char_idx, char_prob in enumerate(prob):
+                new_char = self.ind2char[char_idx]
+                for hypo in hypos:
+                    text = hypo.text
+                    if len(text) == 0 or text[-1] != new_char:
+                        text = text.strip(self.EMPTY_TOK) + new_char
+                    if last: text = text.strip(self.EMPTY_TOK)
+                    new_hypos[text] += char_prob * hypo.prob
+            new_hypos = [Hypothesis(text, prob) for text, prob in new_hypos.items()]
             return new_hypos
 
         def truncate_beam(hypos, beam_size):
             return sorted(hypos, key=lambda x: x.prob, reverse=True)[:beam_size]
 
+        hypos: List[Hypothesis] = [Hypothesis("", 1.)]
         for idx in range(probs_length):
             hypos = extend_and_merge_beam(
-                hypos, idx, last=idx == probs_length-1)
+                hypos, probs[idx], last=idx == probs_length-1)
             hypos = truncate_beam(hypos, beam_size)
         return hypos
