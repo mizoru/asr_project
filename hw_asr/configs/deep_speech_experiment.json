@@ -36,7 +36,7 @@
             "args": {
               "part": "train-clean-100",
               "max_audio_length": 20.0,
-              "max_text_length": 200
+              "max_text_length": 250
             }
           }
         ]
@@ -50,7 +50,7 @@
             "args": {
               "part": "dev-clean",
               "max_audio_length": 20.0,
-              "max_text_length": 200
+              "max_text_length": 250
             }
           }
         ]
@@ -64,7 +64,7 @@
             "args": {
               "part": "test-other",
               "max_audio_length": 20.0,
-              "max_text_length": 200
+              "max_text_length": 250
             }
           }
         ]
@@ -99,7 +99,7 @@
       "type": "OneCycleLR",
       "args": {
         "steps_per_epoch": 200,
-        "epochs": 100,
+        "epochs": 20,
         "anneal_strategy": "cos",
         "max_lr": 4e-3,
         "pct_start": 0.2
