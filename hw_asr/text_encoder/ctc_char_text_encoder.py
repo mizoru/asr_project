@@ -51,7 +51,7 @@ class CTCCharTextEncoder(CharTextEncoder):
             merged = defaultdict(float)
             for hypo in new_hypos:
                 merged[hypo.text] += hypo.prob
-            new_hypos = [Hypothesis(text, prob) or (text, prob) in merged.items()]
+            new_hypos = [Hypothesis(text, prob) for (text, prob) in merged.items()]
             return new_hypos
 
         def truncate_beam(hypos, beam_size):
@@ -60,4 +60,4 @@ class CTCCharTextEncoder(CharTextEncoder):
         for idx in range(probs_length):
             hypos = extend_and_merge_beam(hypos, idx)
             hypos = truncate_beam(hypos, beam_size)
-        return sorted(hypos, key=lambda x: x.prob, reverse=True)
+        return hypos
