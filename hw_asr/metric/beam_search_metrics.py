@@ -15,13 +15,12 @@ class BeamSearchWERMetric(BaseMetric):
 
     def __call__(self, log_probs: Tensor, log_probs_length: Tensor, text: List[str], **kwargs):
         wers = []
-        predictions = torch.argmax(log_probs.cpu(), dim=-1).numpy()
-        lengths = log_probs_length.detach().numpy()
-        for log_prob_vec, length, target_text in zip(predictions, lengths, text):
+        hyposes = [self.text_encoder.ctc_beam_search(
+            log_probs[i], log_probs_length[i], 20) for i in range(log_probs.size(0))]
+        
+        predictions = [hypos[0].text for hypos in hyposes]
+        
+        for pred_text, target_text in zip(predictions, text):
             target_text = BaseTextEncoder.normalize_text(target_text)
-            if hasattr(self.text_encoder, "ctc_decode"):
-                pred_text = self.text_encoder.ctc_decode(log_prob_vec[:length])
-            else:
-                pred_text = self.text_encoder.decode(log_prob_vec[:length])
             wers.append(calc_wer(target_text, pred_text))
         return sum(wers) / len(wers)
