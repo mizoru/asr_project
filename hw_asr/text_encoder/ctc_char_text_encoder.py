@@ -39,7 +39,7 @@ class CTCCharTextEncoder(CharTextEncoder):
         char_length, voc_size = probs.shape
         assert voc_size == len(self.ind2char)
         
-        probs = probs.detach().numpy()
+        probs = probs.detach().cpu().numpy()
         probs_length = probs_length.detach().item()
         
 
