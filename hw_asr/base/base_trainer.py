@@ -196,7 +196,9 @@ class BaseTrainer:
             )
         else:
             self.optimizer.load_state_dict(checkpoint["optimizer"])
-            self.scaler.load_state_dict(checkpoint["scaler"])
+            if "scaler" in checkpoint:
+                self.scaler.load_state_dict(checkpoint["scaler"])
+            else: self.logger.warning("Warning: GradScaler missing in checkpoint")
 
         self.logger.info(
             "Checkpoint loaded. Resume training from epoch {}".format(self.start_epoch)
