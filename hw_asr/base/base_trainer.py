@@ -163,7 +163,7 @@ class BaseTrainer:
             best_path = str(self.checkpoint_dir / "model_best.pth")
             torch.save(state, best_path)
             self.logger.info("Saving current best: model_best.pth ...")
-            self.writer.save_file(filename)
+            self.writer.save_file(best_path)
 
     def _resume_checkpoint(self, resume_path):
         """
