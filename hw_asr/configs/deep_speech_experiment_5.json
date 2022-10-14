@@ -21,11 +21,15 @@
             },
             {
                 "type": "PitchShift",
-                "args": {}
+                "args": {
+                    "sample_rate": 16000
+                }
             },
             {
                 "type": "ColoredNoise",
-                "args": {}
+                "args": {
+                    "sample_rate": 16000
+                }
             }
         ],
         "spectrogram": []
