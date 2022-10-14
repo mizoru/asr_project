@@ -18,6 +18,14 @@
             {
                 "type": "Gain",
                 "args": {}
+            },
+            {
+                "type": "PitchShift",
+                "args": {}
+            },
+            {
+                "type": "ColoredNoise",
+                "args": {}
             }
         ],
         "spectrogram": []

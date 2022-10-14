@@ -4,7 +4,7 @@ from torch import Tensor
 from hw_asr.augmentations.base import AugmentationBase
 
 
-class PitchShift(AugmentationBase):
+class ColoredNoise(AugmentationBase):
     def __init__(self, *args, **kwargs):
         self._aug = torch_audiomentations.AddColoredNoise(*args, **kwargs)
 
