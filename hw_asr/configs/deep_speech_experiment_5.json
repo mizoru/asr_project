@@ -14,12 +14,7 @@
         "log_spec": true
     },
     "augmentations": {
-        "wave": [
-            {
-                "Gain": {
-                    "type": "Gain"
-                }
-            }
+        "wave": [{"type": "Gain"}
         ],
         "spectrogram": []
     },
