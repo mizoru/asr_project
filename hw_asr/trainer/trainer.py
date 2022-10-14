@@ -279,11 +279,10 @@ class Trainer(BaseTrainer):
         self.writer.add_image("spectrogram", ToTensor()(image))
         
     def _log_audio(self, audio, audio_paths, **kwargs):
-        # TODO
         idx = random.randint(0, len(audio)-1)
         audio = audio[idx]
         path = audio_paths[idx]
-        self.writer.add_audio(path, audio)
+        self.writer.add_audio(path, audio, self.config["sr"])
 
     @torch.no_grad()
     def get_grad_norm(self, norm_type=2):
