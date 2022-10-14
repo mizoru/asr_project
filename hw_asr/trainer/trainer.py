@@ -281,8 +281,8 @@ class Trainer(BaseTrainer):
     def _log_audio(self, audio, audio_path, **kwargs):
         idx = random.randint(0, len(audio)-1)
         audio = audio[idx]
-        path = audio_path[idx]
-        self.writer.add_audio(path, audio, self.config["preprocessing"]["sr"])
+        caption = Path(audio_path[idx]).name
+        self.writer.add_audio("audio", audio, self.config["preprocessing"]["sr"], caption)
 
     @torch.no_grad()
     def get_grad_norm(self, norm_type=2):
