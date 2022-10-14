@@ -28,6 +28,7 @@ class DeepSpeech2(BaseModel):
             n_rnn=6
     ):
         super().__init__(n_feats, n_class)
+        self.time_stride = time_stride
         self.cnn = Sequential(
             nn.Conv2d(1, conv_channels[0],
                       (41, 11), (2, time_stride), padding=(20, 5)),
@@ -59,4 +60,4 @@ class DeepSpeech2(BaseModel):
         return {"logits": x}
 
     def transform_input_lengths(self, input_lengths):
-        return (input_lengths - 1)//2 + 1
+        return (input_lengths - 1)//self.time_stride + 1
