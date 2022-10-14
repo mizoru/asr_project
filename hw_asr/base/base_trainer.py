@@ -150,6 +150,7 @@ class BaseTrainer:
             "epoch": epoch,
             "state_dict": self.model.state_dict(),
             "optimizer": self.optimizer.state_dict(),
+            "scaler": self.scaler.state_dict(),
             "monitor_best": self.mnt_best,
             "config": self.config,
         }
@@ -195,6 +196,7 @@ class BaseTrainer:
             )
         else:
             self.optimizer.load_state_dict(checkpoint["optimizer"])
+            self.scaler.load_state_dict(checkpoint["scaler"])
 
         self.logger.info(
             "Checkpoint loaded. Resume training from epoch {}".format(self.start_epoch)
