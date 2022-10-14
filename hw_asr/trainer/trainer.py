@@ -281,7 +281,7 @@ class Trainer(BaseTrainer):
     def _log_audio(self, audio, audio_path, **kwargs):
         idx = random.randint(0, len(audio)-1)
         audio = audio[idx]
-        path = audio_paths[idx]
+        path = audio_path[idx]
         self.writer.add_audio(path, audio, self.config["sr"])
 
     @torch.no_grad()
