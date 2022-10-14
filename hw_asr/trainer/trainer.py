@@ -278,7 +278,7 @@ class Trainer(BaseTrainer):
         image = PIL.Image.open(plot_spectrogram_to_buf(spectrogram))
         self.writer.add_image("spectrogram", ToTensor()(image))
         
-    def _log_audio(self, audio, audio_paths, **kwargs):
+    def _log_audio(self, audio, audio_path, **kwargs):
         idx = random.randint(0, len(audio)-1)
         audio = audio[idx]
         path = audio_paths[idx]
