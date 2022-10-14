@@ -15,8 +15,9 @@ class BeamSearchWERMetric(BaseMetric):
 
     def __call__(self, log_probs: Tensor, log_probs_length: Tensor, text: List[str], **kwargs):
         wers = []
+        probs = log_probs.exp()
         hyposes = [self.text_encoder.ctc_beam_search(
-            log_probs[i], log_probs_length[i], 20) for i in range(log_probs.size(0))]
+            probs[i], log_probs_length[i], 20) for i in range(probs.size(0))]
         
         predictions = [hypos[0].text for hypos in hyposes]
         

@@ -37,7 +37,7 @@ class Trainer(BaseTrainer):
             len_epoch=None,
             skip_oom=True,
             mixed_precision=True,
-            log_step=200
+            log_step=50
     ):
         super().__init__(model, criterion, metrics, optimizer,
                          scaler, config, device, mixed_precision)
@@ -235,7 +235,7 @@ class Trainer(BaseTrainer):
             return
 
         beam_search_hypos = [self.text_encoder.ctc_beam_search(
-            log_probs[i], log_probs_length[i], 20) for i in range(examples_to_log)]
+            log_probs[i].exp(), log_probs_length[i], 20) for i in range(examples_to_log)]
         
         beam_search_texts = [hypos[0].text for hypos in beam_search_hypos]
 
