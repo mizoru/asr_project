@@ -15,18 +15,17 @@ def collate_fn(dataset_items: List[dict]):
     n_features = dataset_items[0]["spectrogram"].size(1)
     result_batch = {}
     
-    for key in ["audio_path", "text", "duration"]:
+    for key in ["audio_path", "text", "duration", "audio"]:
         result_batch[key] = [item[key] for item in dataset_items]
 
-    # TODO: Maybe write a single loop for these?
-    audio_length = [item["audio"].size(1) for item in dataset_items]
-    max_length = max(audio_length)
-    audio_batch = torch.zeros(bs, max_length)
-    for i, item in enumerate(dataset_items):
-        audio = item["audio"]
-        audio_batch[i, :audio.size(1)] = audio
-    result_batch["audio"] = audio_batch
-    result_batch["audio_length"] = torch.tensor(audio_length)
+    # audio_length = [item["audio"].size(1) for item in dataset_items]
+    # max_length = max(audio_length)
+    # audio_batch = torch.zeros(bs, max_length)
+    # for i, item in enumerate(dataset_items):
+    #     audio = item["audio"]
+    #     audio_batch[i, :audio.size(1)] = audio
+    # result_batch["audio"] = audio_batch
+    # result_batch["audio_length"] = torch.tensor(audio_length)
 
     spectrogram_length = [item["spectrogram"].size(2) for item in dataset_items]
     max_length = max(spectrogram_length)

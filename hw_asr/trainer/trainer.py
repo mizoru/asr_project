@@ -205,6 +205,7 @@ class Trainer(BaseTrainer):
             self._log_scalars(self.evaluation_metrics)
             self._log_predictions(**batch)
             self._log_spectrogram(batch["spectrogram"])
+            self._log_audio(**batch)
 
         # add histogram of model parameters to the tensorboard
         for name, p in self.model.named_parameters():
@@ -275,6 +276,13 @@ class Trainer(BaseTrainer):
         spectrogram = random.choice(spectrogram_batch.cpu())
         image = PIL.Image.open(plot_spectrogram_to_buf(spectrogram))
         self.writer.add_image("spectrogram", ToTensor()(image))
+        
+    def _log_audio(self, audio, audio_paths, **kwargs):
+        # TODO
+        idx = random.randint(0, len(audio)-1)
+        audio = audio[idx]
+        path = audio_paths[idx]
+        self.writer.add_audio(path, audio)
 
     @torch.no_grad()
     def get_grad_norm(self, norm_type=2):
