@@ -67,7 +67,7 @@
                 {
                     "type": "LibrispeechDataset",
                     "args": {
-                        "part": "train-clean-500",
+                        "part": "train-other-500",
                         "max_audio_length": 20.0,
                         "max_text_length": 270
                     }
