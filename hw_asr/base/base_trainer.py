@@ -15,20 +15,22 @@ class BaseTrainer:
     def __init__(self, model: BaseModel, criterion, metrics, optimizer, scaler, config, device, mixed_precision):
         self.device = device
         self.config = config
-        self.logger = config.get_logger("trainer", config["trainer"]["verbosity"])
+        self.logger = config.get_logger(
+            "trainer", config["trainer"]["verbosity"])
 
         self.model = model
         self.criterion = criterion
         self.metrics = metrics
         self.optimizer = optimizer
         self.scaler = scaler
-        
+
         self.mixed_precision = mixed_precision
         if self.device.type == "cpu":
             self.mixed_dtype = torch.bfloat16
-            self.logger.info(f"Setting dtype to {self.mixed_dtype} for {self.device.type} device")
+            self.logger.info(
+                f"Setting dtype to {self.mixed_dtype} for {self.device.type} device")
         else:
-            self.mixed_dtype = torch.float16 
+            self.mixed_dtype = torch.float16
 
         # for interrupt saving
         self._last_epoch = 0
@@ -154,16 +156,18 @@ class BaseTrainer:
             "monitor_best": self.mnt_best,
             "config": self.config,
         }
-        filename = str(self.checkpoint_dir / "checkpoint-epoch{}.pth".format(epoch))
+        filename = str(self.checkpoint_dir /
+                       "checkpoint-epoch{}.pth".format(epoch))
         if not (only_best and save_best):
             torch.save(state, filename)
             self.logger.info("Saving checkpoint: {} ...".format(filename))
-            self.writer.save_file(filename)
+
         if save_best:
             best_path = str(self.checkpoint_dir / "model_best.pth")
             torch.save(state, best_path)
             self.logger.info("Saving current best: model_best.pth ...")
-            self.writer.save_file(best_path)
+
+        self.writer.save_file(self.checkpoint_dir)
 
     def _resume_checkpoint(self, resume_path):
         """
@@ -198,8 +202,11 @@ class BaseTrainer:
             self.optimizer.load_state_dict(checkpoint["optimizer"])
             if "scaler" in checkpoint:
                 self.scaler.load_state_dict(checkpoint["scaler"])
-            else: self.logger.warning("Warning: GradScaler missing in checkpoint")
+            else:
+                self.logger.warning(
+                    "Warning: GradScaler missing in checkpoint")
 
         self.logger.info(
-            "Checkpoint loaded. Resume training from epoch {}".format(self.start_epoch)
+            "Checkpoint loaded. Resume training from epoch {}".format(
+                self.start_epoch)
         )
