@@ -110,7 +110,7 @@ class Trainer(BaseTrainer):
             except RuntimeError as e:
                 if "out of memory" in str(e) and self.skip_oom:
                     self.logger.warning(
-                        "OOM on batch. Skipping batch.\n", exc_info)
+                        "OOM on batch. Skipping batch.\n", exc_info=True)
                     for p in self.model.parameters():
                         if p.grad is not None:
                             del p.grad  # free some memory
@@ -129,7 +129,10 @@ class Trainer(BaseTrainer):
                 self.writer.add_scalar(
                     "learning rate", self.lr_scheduler.get_last_lr()[0]
                 )
-                self._log_predictions(**batch)
+                try:
+                    self._log_predictions(**batch)
+                except Exception:
+                    self.logger.warning("Warning: failed to log predictions", exc_info=True)
                 self._log_spectrogram(batch["spectrogram"])
                 self._log_audio(**batch)
                 self._log_scalars(self.train_metrics)
@@ -204,7 +207,10 @@ class Trainer(BaseTrainer):
                 )
             self.writer.set_step(epoch * self.len_epoch, part)
             self._log_scalars(self.evaluation_metrics)
-            self._log_predictions(**batch)
+            try:
+                self._log_predictions(**batch)
+            except Exception:
+                self.logger.warning("Warning: failed to log predictions", exc_info=True)
             self._log_spectrogram(batch["spectrogram"])
             self._log_audio(**batch)
 
