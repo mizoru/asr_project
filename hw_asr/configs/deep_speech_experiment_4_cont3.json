@@ -121,7 +121,7 @@
     "mixed_precision": true,
     "loss": {
         "type": "CTCLoss",
-        "args": {}
+        "args": {"zero_infinity": true}
     },
     "metrics": [
         {
