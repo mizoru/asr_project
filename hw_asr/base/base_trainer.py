@@ -161,13 +161,15 @@ class BaseTrainer:
         if not (only_best and save_best):
             torch.save(state, filename)
             self.logger.info("Saving checkpoint: {} ...".format(filename))
+            self.writer.save_file(filename)
 
         if save_best:
             best_path = str(self.checkpoint_dir / "model_best.pth")
             torch.save(state, best_path)
             self.logger.info("Saving current best: model_best.pth ...")
+            self.writer.save_file(best_path)
 
-        self.writer.save_file(str(self.checkpoint_dir))
+        self.writer.save_file(str(self.checkpoint_dir / "config.json"))
 
     def _resume_checkpoint(self, resume_path):
         """
