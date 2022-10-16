@@ -69,6 +69,9 @@ class CTCCharTextEncoder(CharTextEncoder):
         return hypos
     
     def ctc_decode_lm(self, probs: torch.tensor, probs_length):
+        probs = probs.detach().cpu().numpy()
+        probs_length = probs_length.detach().item()
+        
         if not self.decoder:
             vocab = [""] + list(self.alphabet)
             self.decoder = setup_lm_decoder(vocab)
