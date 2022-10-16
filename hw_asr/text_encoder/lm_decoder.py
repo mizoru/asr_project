@@ -40,9 +40,3 @@ def setup_lm_decoder(vocab, lm = "3-gram.pruned.1e-7"):
     decoder = build_ctcdecoder(vocab, str(lm_path), unigram_list)
     
     return decoder
-
-# TODO:
-# from string import ascii_lowercase
-
-# setup_lm_decoder(['']+list(ascii_lowercase+' '))
-        

@@ -1,0 +1,115 @@
+{
+    "name": "deep_speech_validation",
+    "n_gpu": 1,
+    "preprocessing": {
+      "sr": 16000,
+      "spectrogram": {
+        "type": "MelSpectrogram",
+        "args": {
+          "n_mels": 128,
+          "n_fft": 500,
+          "win_length": 400
+        }
+      },
+      "log_spec": true
+    },
+    "augmentations": {
+      "wave": [],
+      "spectrogram": []
+    },
+    "arch": {
+      "type": "DeepSpeech2",
+      "args": {
+        "rnn_hidden": 1024,
+        "n_rnn": 6,
+        "conv_channels": [32, 32, 96],
+        "time_stride": 3
+      }
+    },
+    "data": {
+      "test": {
+        "batch_size": 100,
+        "num_workers": 5,
+        "datasets": [
+          {
+            "type": "LibrispeechDataset",
+            "args": {
+              "part": "test-clean"
+            }
+          }
+        ]
+      },
+      "test-other": {
+        "batch_size": 100,
+        "num_workers": 5,
+        "datasets": [
+          {
+            "type": "LibrispeechDataset",
+            "args": {
+              "part": "test-other"
+            }
+          }
+        ]
+      }
+    },
+    "optimizer": {
+      "type": "Adam",
+      "args": {
+        "lr": 1e-4
+      }
+    },
+    "mixed_precision": false,
+    "loss": {
+      "type": "CTCLoss",
+      "args": {}
+    },
+    "metrics": [
+      {
+        "type": "ArgmaxWERMetric",
+        "args": {
+          "name": "WER (argmax)"
+        }
+      },
+      {
+        "type": "ArgmaxCERMetric",
+        "args": {
+          "name": "CER (argmax)"
+        }
+      },
+      {
+        "type": "BeamSearchWERMetric",
+        "args": {
+          "name": "WER (BeamSearch)"
+        }
+      },
+      {
+        "type": "LMDecoderWERMetric",
+        "args": {
+          "name": "WER (LM_decoder)"
+        }
+      }
+    ],
+    "lr_scheduler": {
+      "type": "OneCycleLR",
+      "args": {
+        "steps_per_epoch": 300,
+        "epochs": 20,
+        "anneal_strategy": "cos",
+        "max_lr": 4e-4,
+        "pct_start": 0.2
+      }
+    },
+    "trainer": {
+      "epochs": 30,
+      "save_dir": "saved/",
+      "save_period": 5,
+      "verbosity": 2,
+      "monitor": "min val_loss",
+      "early_stop": 100,
+      "visualize": "wandb",
+      "wandb_project": "asr_project",
+      "len_epoch": 300,
+      "grad_norm_clip": 300
+    }
+  }
+  
