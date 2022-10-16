@@ -20,6 +20,7 @@ class CTCCharTextEncoder(CharTextEncoder):
         vocab = [self.EMPTY_TOK] + list(self.alphabet)
         self.ind2char = dict(enumerate(vocab))
         self.char2ind = {v: k for k, v in self.ind2char.items()}
+        self.decoder = None
 
     def ctc_decode(self, inds: List[int]) -> str:
         chars = ['']
