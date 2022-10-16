@@ -4,6 +4,7 @@ from collections import defaultdict
 import torch
 
 from .char_text_encoder import CharTextEncoder
+from hw_asr.text_encoder.lm_decoder import setup_lm_decoder
 
 
 class Hypothesis(NamedTuple):
@@ -65,3 +66,10 @@ class CTCCharTextEncoder(CharTextEncoder):
                 hypos, probs[idx], last=idx == probs_length-1)
             hypos = truncate_beam(hypos, beam_size)
         return hypos
+    
+    def ctc_decode_lm(self, probs: torch.tensor, probs_length):
+        if not self.decoder:
+            vocab = [""] + list(self.alphabet)
+            self.decoder = setup_lm_decoder(vocab)
+        return self.decoder.decode(probs[:probs_length-1])
+        
