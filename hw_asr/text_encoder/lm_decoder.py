@@ -36,7 +36,6 @@ def setup_lm_decoder(vocab, lm = "3-gram.pruned.1e-7"):
     with open(unigram_path) as f:
         unigram_list = [t.lower() for t in f.read().strip().split("\n")]
         
-    # kenlm_model = kenlm.Model(str(lm_path))
     decoder = build_ctcdecoder(vocab, str(lm_path), unigram_list)
     
     return decoder
