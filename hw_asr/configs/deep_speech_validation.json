@@ -23,7 +23,7 @@
         "rnn_hidden": 1024,
         "n_rnn": 6,
         "conv_channels": [32, 32, 96],
-        "time_stride": 2
+        "time_stride": 3
       }
     },
     "data": {
