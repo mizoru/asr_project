@@ -85,6 +85,12 @@
         "args": {
           "name": "WER (BeamSearch)"
         }
+      },
+      {
+        "type": "LMDecoderWERMetric",
+        "args": {
+          "name": "WER (LM_decoder)"
+        }
       }
     ],
     "lr_scheduler": {
