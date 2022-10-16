@@ -6,6 +6,8 @@ from pathlib import Path
 import torch
 from tqdm import tqdm
 
+import hw_asr.loss as module_loss
+import hw_asr.metric as module_metric
 import hw_asr.model as module_model
 from hw_asr.trainer import Trainer
 from hw_asr.utils import ROOT_PATH
@@ -18,6 +20,8 @@ DEFAULT_CHECKPOINT_PATH = ROOT_PATH / "default_test_model" / "checkpoint.pth"
 def main(config, out_file):
     logger = config.get_logger("test")
 
+    mixed_precision = config["mixed_precision"]
+    
     # define cpu or gpu if possible
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -42,36 +46,37 @@ def main(config, out_file):
     model = model.to(device)
     model.eval()
 
-    results = []
-
-    with torch.no_grad():
-        for batch_num, batch in enumerate(tqdm(dataloaders["test"])):
-            batch = Trainer.move_batch_to_device(batch, device)
-            output = model(**batch)
-            if type(output) is dict:
-                batch.update(output)
-            else:
-                batch["logits"] = output
-            batch["log_probs"] = torch.log_softmax(batch["logits"], dim=-1)
-            batch["log_probs_length"] = model.transform_input_lengths(
-                batch["spectrogram_length"]
-            )
-            batch["probs"] = batch["log_probs"].exp().cpu()
-            batch["argmax"] = batch["probs"].argmax(-1)
-            for i in range(len(batch["text"])):
-                argmax = batch["argmax"][i]
-                argmax = argmax[: int(batch["log_probs_length"][i])]
-                results.append(
-                    {
-                        "ground_truth": batch["text"][i],
-                        "pred_text_argmax": text_encoder.ctc_decode(argmax.cpu().numpy()),
-                        "pred_text_beam_search": text_encoder.ctc_beam_search(
-                            batch["probs"][i], batch["log_probs_length"][i], beam_size=100
-                        )[:10],
-                    }
-                )
+    loss_module = config.init_obj(config["loss"], module_loss).to(device)
+    metrics = [
+        config.init_obj(metric_dict, module_metric, text_encoder=text_encoder)
+        for metric_dict in config["metrics"]
+    ]
+    
+    trainable_params = filter(lambda p: p.requires_grad, model.parameters())
+    optimizer = config.init_obj(config["optimizer"], torch.optim, trainable_params)
+    scaler = torch.cuda.amp.GradScaler(enabled=mixed_precision)
+    lr_scheduler = config.init_obj(config["lr_scheduler"], torch.optim.lr_scheduler, optimizer)
+    trainer = Trainer(
+        model,
+        loss_module,
+        metrics,
+        optimizer,
+        scaler,
+        text_encoder=text_encoder,
+        config=config,
+        device=device,
+        dataloaders=dataloaders,
+        lr_scheduler=lr_scheduler,
+        len_epoch=config["trainer"].get("len_epoch", None),
+        mixed_precision=mixed_precision
+    )
+    
+    results = trainer.validate()
+    
     with Path(out_file).open("w") as f:
         json.dump(results, f, indent=2)
+
+    
 
 
 if __name__ == "__main__":

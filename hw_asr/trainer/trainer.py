@@ -44,7 +44,7 @@ class Trainer(BaseTrainer):
         self.skip_oom = skip_oom
         self.text_encoder = text_encoder
         self.config = config
-        self.train_dataloader = dataloaders["train"]
+        self.train_dataloader = dataloaders.get("train", None)
         if len_epoch is None:
             # epoch-based training
             self.len_epoch = len(self.train_dataloader)
@@ -146,6 +146,15 @@ class Trainer(BaseTrainer):
 
         for part, dataloader in self.evaluation_dataloaders.items():
             val_log = self._evaluation_epoch(epoch, part, dataloader)
+            log.update(**{f"{part}_{name}": value for name,
+                       value in val_log.items()})
+
+        return log
+    
+    def validate(self):
+        log = dict()
+        for part, dataloader in self.evaluation_dataloaders.items():
+            val_log = self._evaluation_epoch(1, part, dataloader)
             log.update(**{f"{part}_{name}": value for name,
                        value in val_log.items()})
 
