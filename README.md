@@ -10,7 +10,7 @@ pip install -r requirements.txt
 pip install https://github.com/kpu/kenlm/archive/master.zip
 ```
 
-Copy [this folder](https://drive.google.com/drive/folders/1L2oh-kxpbHP15CCRYbea9m9o6kEPEDam) so that you have `asr_project/default_test_model/default_checkpoint.pth` as the checkpoint path.
+Copy [this folder](https://drive.google.com/drive/folders/1L2oh-kxpbHP15CCRYbea9m9o6kEPEDam) so that you have `asr_project/default_test_model/checkpoint.pth` as the checkpoint path.
 
 You can now run this line to get predictions on files in `test_data`:
 ```shell
