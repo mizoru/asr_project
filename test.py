@@ -68,8 +68,8 @@ def main(config, out_file):
                         "pred_text_argmax": text_encoder.ctc_decode(argmax.cpu().numpy()),
                         "pred_text_beam_search": text_encoder.ctc_beam_search(
                             batch["probs"][i], batch["log_probs_length"][i], beam_size=100
-                        )[:10]
-                        "pred_text_lm": lm_decoded,
+                        )[:10],
+                        "pred_text_lm": lm_decoded
                     }
                 )
     with Path(out_file).open("w") as f:
